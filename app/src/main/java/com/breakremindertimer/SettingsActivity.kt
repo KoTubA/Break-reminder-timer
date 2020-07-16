@@ -4,11 +4,28 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 
 
 class SettingsActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        //Users preference
+        val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
+        var text: String? = themePreference.getString("color_theme", "")
+
+        when (text) {
+            "AppThemeDark" -> {
+                setTheme(R.style.AppThemeDark)
+            }
+            "AppThemeLight" -> {
+                setTheme(R.style.AppThemeLight)
+            }
+            else -> {
+                setTheme(R.style.AppTheme)
+            }
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
         supportFragmentManager
@@ -16,6 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             .replace(R.id.settings, SettingsFragment())
             .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

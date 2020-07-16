@@ -7,12 +7,30 @@ import android.os.CountDownTimer
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.set_time.view.*
 
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        //Users preference
+        val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
+        var text: String? = themePreference.getString("color_theme", "")
+
+        when (text) {
+            "AppThemeDark" -> {
+                setTheme(R.style.AppTheme_NoActionBarDark)
+            }
+            "AppThemeLight" -> {
+                setTheme(R.style.AppTheme_NoActionBarLight)
+            }
+            else -> {
+                setTheme(R.style.AppTheme_NoActionBar)
+            }
+        }
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

@@ -7,10 +7,11 @@
         app:title="General">
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
+            android:icon="@drawable/ic_outline_palette_24"
+            app:defaultValue="1"
+            app:entries="@array/theme_list"
+            app:entryValues="@array/theme_values"
+            app:key="color_theme"
             app:title="Color themes"
             app:useSimpleSummaryProvider="true" />
 
@@ -19,22 +20,26 @@
     <PreferenceCategory app:title="Alarms">
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
+            app:defaultValue="1"
+            app:entries="@array/theme_list"
+            app:entryValues="@array/theme_values"
+            app:icon="@drawable/ic_baseline_music_note_24"
+            app:key="sound"
             app:title="Timer sound"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_vibration_24"
             app:key="sync"
             app:title="Timer vibrate" />
+
         <SeekBarPreference
             android:id="@+id/preference_delay_seek_bar"
             android:defaultValue="1"
             android:max="6"
             android:title="Alarm volume"
-            app:icon="@drawable/ic_baseline_alarm_24" />
+            app:icon="@drawable/ic_baseline_volume_up_24" />
 
     </PreferenceCategory>
 
@@ -46,8 +51,9 @@
         <Preference
             android:summary="v.1.0.0"
             app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
+            app:entries="@array/theme_list"
+            app:entryValues="@array/theme_values"
+            app:icon="@drawable/ic_outline_info_24"
             app:key="reply"
             app:title="Version app"
             app:useSimpleSummaryProvider="true" />

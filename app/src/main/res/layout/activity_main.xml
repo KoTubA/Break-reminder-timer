@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary3"
     android:orientation="vertical"
     android:padding="10dp"
     tools:context=".MainActivity">
@@ -26,7 +25,6 @@
             android:gravity="center"
             android:paddingLeft="44dp"
             android:text="@string/app_name"
-            android:textColor="@color/colorWhite"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -68,7 +66,6 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:text="00:15:00"
-            android:textColor="@color/colorWhite"
             android:textSize="48sp"
             android:textStyle="bold" />
 

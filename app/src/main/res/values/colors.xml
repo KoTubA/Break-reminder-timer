@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#60e0e7</color>
-    <color name="colorPrimary2">#5183f9</color>
-    <color name="colorPrimary3">#211c55</color>
+    <color name="colorPrimaryBright">#60e0e7</color>
+    <color name="colorPrimary">#5183f9</color>
+    <color name="colorPrimaryDark">#211c55</color>
+    <color name="colorTaskBar">#1a1644</color>
+    <color name="colorTopBar">#131033</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="colorShapeProgresBar">#23215e</color>
+    <color name="colorShapeProgressBar">#23215e</color>
     <color name="colorGray">#DDDDDD</color>
+
+    <!-- Dark theme -->
+    <color name="colorPrimaryDark_DarkTheme">#121212</color>
+    <color name="colorTaskBar_DarkTheme">#1f1f1f</color>
+    <color name="colorTopBar_DarkTheme">#000000</color>
 </resources>

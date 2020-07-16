@@ -1,8 +1,56 @@
 <resources>
 
-    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorTaskBar</item>
+        <item name="colorPrimaryDark">@color/colorTopBar</item>
+        <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:textColor">@color/colorWhite</item>
-        <item name="android:background">@color/colorPrimary3</item>
+        <item name="android:textColorSecondary">@color/colorGray</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+    </style>
+
+    <!-- Dark application theme -->
+    <style name="AppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorTaskBar_DarkTheme</item>
+        <item name="colorPrimaryDark">@color/colorTopBar_DarkTheme</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorSecondary">@color/colorGray</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark_DarkTheme</item>
+    </style>
+
+    <!-- Light application theme -->
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorTaskBar</item>
+        <item name="colorPrimaryDark">@color/colorTopBar</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorSecondary">@color/colorGray</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+    </style>
+
+    <!-- No action bar base application theme-->
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- No action bar dark application theme-->
+    <style name="AppTheme.NoActionBarDark" parent="AppThemeDark">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- No action bar light application theme-->
+    <style name="AppTheme.NoActionBarLight" parent="AppThemeLight">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@color/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/colorWhite</item>
     </style>
 

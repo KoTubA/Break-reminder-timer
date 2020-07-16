@@ -1,0 +1,57 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:baselineAligned="false"
+        app:singleLineTitle="false"
+        app:title="General">
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="Color themes"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Alarms">
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="Timer sound"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="Timer vibrate" />
+        <SeekBarPreference
+            android:id="@+id/preference_delay_seek_bar"
+            android:defaultValue="1"
+            android:max="6"
+            android:title="Alarm volume"
+            app:icon="@drawable/ic_baseline_alarm_24" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:baselineAligned="false"
+        app:singleLineTitle="false"
+        app:title="About">
+
+        <Preference
+            android:summary="v.1.0.0"
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="Version app"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

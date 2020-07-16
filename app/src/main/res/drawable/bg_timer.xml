@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+<!-- Drop Shadow Stack -->
+<item>
+    <shape android:shape="oval">
+        <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+        <stroke android:color="#05000000" android:width="1dp"  />
+    </shape>
+</item>
+<item>
+    <shape android:shape="oval">
+        <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+        <stroke android:color="#0D60E0E7" android:width="1dp" />
+    </shape>
+</item>
+<item>
+    <shape android:shape="oval">
+        <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+        <stroke android:color="#1A60E0E7" android:width="1dp" />
+    </shape>
+</item>
+<item>
+    <shape android:shape="oval">
+        <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+        <stroke android:color="#2660E0E7" android:width="1dp" />
+    </shape>
+</item>
+<item>
+    <shape android:shape="oval">
+        <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+        <stroke android:color="#3360E0E7" android:width="1dp" />
+    </shape>
+</item>
+<item>
+    <shape android:shape="oval">
+        <padding android:top="0.5dp" android:right="0.5dp" android:bottom="0.5dp" android:left="0.5dp" />
+        <stroke android:color="#BF60E0E7" android:width="0.5dp" />
+    </shape>
+</item>
+
+
+<!-- Background -->
+<item>
+    <shape xmlns:android="http://schemas.android.com/apk/res/android"
+        android:shape="oval">
+        <solid android:color="@color/colorPrimary3"/>
+        <size android:height="45dp" android:width="45dp"/>
+    </shape>
+</item>
+</layer-list>

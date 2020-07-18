@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity() {
             "AppThemeDark" -> {
                 setTheme(R.style.AppTheme_NoActionBarDark)
             }
-            "AppThemeLight" -> {
-                setTheme(R.style.AppTheme_NoActionBarLight)
+            "AppThemeBlackAndWhite" -> {
+                setTheme(R.style.AppTheme_NoActionBarBlackAndWhite)
             }
             else -> {
                 setTheme(R.style.AppTheme_NoActionBar)

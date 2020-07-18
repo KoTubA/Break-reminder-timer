@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryBright">#60e0e7</color>
-    <color name="colorPrimary">#5183f9</color>
-    <color name="colorPrimaryDark">#211c55</color>
-    <color name="colorTaskBar">#1a1644</color>
-    <color name="colorTopBar">#131033</color>
     <color name="colorWhite">#FFFFFF</color>
-    <color name="colorShapeProgressBar">#23215e</color>
     <color name="colorGray">#DDDDDD</color>
+    <color name="colorPrimaryBright">#60e0e7</color>
+    <color name="colorShadow">#1A000000</color>
+
+    <color name="colorPrimaryDark">#211c55</color>
+    <color name="colorTaskBar">#282268</color>
+    <color name="colorTopBar">#131033</color>
+    <color name="colorBackgroundProgressBar">#241E5C</color>
+
+    <color name="colorStartProgressBar">#5184f9</color>
+    <color name="colorCenterProgressBar">#56a7f2</color>
+    <color name="colorEndProgressBar">#60e0e7</color>
+    <color name="colorSecondary">#5184f9</color>
 
     <!-- Dark theme -->
-    <color name="colorPrimaryDark_DarkTheme">#121212</color>
+    <color name="colorPrimaryDark_DarkTheme">#1e1e1e</color>
     <color name="colorTaskBar_DarkTheme">#1f1f1f</color>
     <color name="colorTopBar_DarkTheme">#000000</color>
+    <color name="colorBackgroundProgressBar_DarkTheme">#222222</color>
+
+    <!-- Black and white theme -->
+    <color name="colorSecondaryBlackAndWhite">#FFFFFF</color>
+
+    <!-- colorBackgroundProgressBar - Set 2-4 tick up than colorPrimaryDark -->
 </resources>

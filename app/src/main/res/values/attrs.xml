@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Other values-->
+    <attr name="timerBgColor" format="color" />
+    <attr name="timerSecondColor" format="color" />
+    <attr name="timerBackgroundProgressBarColor" format="color" />
+    <attr name="SecondaryBackgroundColor" format="color" />
+    <attr name="SecondaryTextColor" format="color" />
+    <attr name="StartProgressBarColor" format="color" ></attr>
+    <attr name="CenterProgressBarColor" format="color" ></attr>
+    <attr name="EndProgressBarColor" format="color" ></attr>
+</resources>

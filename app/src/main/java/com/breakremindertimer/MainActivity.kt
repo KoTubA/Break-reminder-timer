@@ -74,10 +74,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             //Creation dialog with NumberPicker
-            val dialog = AlertDialog.Builder(this, R.style.AlertDialogCustom)
+            val dialog = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.set_time, null)
-            dialog.setView(dialogView)
             dialog.setTitle(R.string.dialog_title)
+            dialog.setView(dialogView)
 
             var hours = dialogView.numpicker_hours
             var minutes = dialogView.numpicker_minutes

@@ -111,7 +111,10 @@
         <item name="colorControlActivated">@color/colorWhite</item>
     </style>
 
-    <!-- Base application secondary theme
-    <item name="colorAccent">@color/colorSecondary</item> -->
+    <!-- Custom Number Picker -->
+    <style name="AlertDialogCustomTextColor" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+    </style>
 
 </resources>

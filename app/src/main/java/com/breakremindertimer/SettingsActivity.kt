@@ -3,7 +3,6 @@ package com.breakremindertimer
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
@@ -63,7 +62,6 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     //Listener change user preference
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "color_theme") {
-            //recreate()
             restartApp()
         }
     }
@@ -71,14 +69,14 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     //Unregister listener
     override fun onDestroy() {
         super.onDestroy()
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .unregisterOnSharedPreferenceChangeListener(this)
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    //Reset Application ***
+    //Reset Application
     fun restartApp() {
-        var restart = Intent(this, MainActivity::class.java)
-        finish()
-        startActivity(restart)
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        overridePendingTransition(R.anim.animation_activity_start,R.anim.animation_activity_end)
     }
 }

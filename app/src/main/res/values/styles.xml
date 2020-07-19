@@ -42,7 +42,7 @@
         <item name="alertDialogTheme">@style/AlertDialogCustomDark</item>
     </style>
 
-    <!-- Dark application theme 2 -->
+    <!-- Black and White application theme-->
     <style name="AppThemeBlackAndWhite" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorTaskBar_DarkTheme</item>
         <item name="colorPrimaryDark">@color/colorTopBar_DarkTheme</item>
@@ -115,6 +115,11 @@
     <style name="AlertDialogCustomTextColor" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textColorPrimary">@color/colorWhite</item>
+    </style>
+
+    <!-- SplashScreen theme -->
+    <style name="SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@drawable/splash_background</item>
     </style>
 
 </resources>

@@ -6,7 +6,7 @@
     <attr name="timerBackgroundProgressBarColor" format="color" />
     <attr name="SecondaryBackgroundColor" format="color" />
     <attr name="SecondaryTextColor" format="color" />
-    <attr name="StartProgressBarColor" format="color" ></attr>
-    <attr name="CenterProgressBarColor" format="color" ></attr>
-    <attr name="EndProgressBarColor" format="color" ></attr>
+    <attr name="StartProgressBarColor" format="color" />
+    <attr name="CenterProgressBarColor" format="color" />
+    <attr name="EndProgressBarColor" format="color" />
 </resources>

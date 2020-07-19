@@ -4,7 +4,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.widget.NumberPicker
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
@@ -15,9 +17,24 @@ import kotlinx.android.synthetic.main.set_time.view.*
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        //Load user Preference related to time
+        val PREFS_NAME = "MyPrefsFile"
+        val settings = getSharedPreferences(PREFS_NAME, 0)
+
+        //Check that the user launch app for first time and fix bug onSharedPreferenceClick()
+        if (settings.getBoolean("my_first_time", true)) {
+            PreferenceManager.setDefaultValues(this, R.xml.root_preferences, true)
+            val values = settings.edit()
+            values.putBoolean("my_first_time", false)
+            values.putInt("timer_hours",0)
+            values.putInt("timer_minutes",15)
+            values.putInt("timer_seconds",0)
+            values.apply()
+        }
+
         //Users preference
         val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        var text: String? = themePreference.getString("color_theme", "")
+        val text: String? = themePreference.getString("color_theme", "")
 
         when (text) {
             "AppThemeDark" -> {
@@ -34,18 +51,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //Initial timer settings
+        val HoursPreference = settings.getInt("timer_hours",0)
+        val MinutesPreference = settings.getInt("timer_minutes",15)
+        val SecondsPreference = settings.getInt("timer_seconds",0)
+
+        var HoursValue: Int = HoursPreference
+        var MinutesValue: Int = MinutesPreference
+        var SecondsValue: Int = SecondsPreference
+        var time: Long = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+        progressBar.max = time.toInt()
+
         //Set default values
         lateinit var HoursText: String
         lateinit var MinutesText: String
         lateinit var SecondsText: String
-
-        //Initial timer settings
-        var HoursValue: Int = 0
-        var MinutesValue: Int = 15
-        var SecondsValue: Int = 0
-        var time: Long = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-        progressBar.max = time.toInt()
-
         lateinit var timer: CountDownTimer
         var counting:Boolean = false
 
@@ -67,6 +87,10 @@ class MainActivity : AppCompatActivity() {
             progressBar.progress = time.toInt()
         }
 
+        //Load watch data when starting the application
+        setData()
+        SecondaryTimer.setText("$HoursText:$MinutesText:$SecondsText")
+
         addTime.setOnClickListener {
             if(counting) {
                 timer.cancel()
@@ -84,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             var seconds = dialogView.numpicker_seconds
 
             //Set attributes NumberPicker
-            val StrsDate = SetTimer.text.split(":").toTypedArray()
+            val StrsDate = SecondaryTimer.text.split(":").toTypedArray()
             hours.minValue = 0
             hours.maxValue = 23
             hours.value = StrsDate[0].toInt()
@@ -102,6 +126,13 @@ class MainActivity : AppCompatActivity() {
 
 
             dialog.setPositiveButton("SET TIME") { _: DialogInterface, _: Int ->
+                //Save data to Preference
+                val values = settings.edit()
+                values.putInt("timer_hours",hours.value)
+                values.putInt("timer_minutes",minutes.value)
+                values.putInt("timer_seconds",seconds.value)
+                values.apply()
+
                 HoursValue = hours.value
                 MinutesValue = minutes.value
                 SecondsValue = seconds.value
@@ -111,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                 setData()
 
                 //Secondary timer
-                SetTimer.setText("$HoursText:$MinutesText:$SecondsText")
+                SecondaryTimer.setText("$HoursText:$MinutesText:$SecondsText")
             }
             dialog.setNegativeButton("CANCEL") { _: DialogInterface, _: Int -> }
 
@@ -168,8 +199,8 @@ class MainActivity : AppCompatActivity() {
                 pauseTimer()
                 counting = false
             }
-            MainTimer.text = SetTimer.text
-            val StrsDateHistory = SetTimer.text.split(":").toTypedArray()
+            MainTimer.text = SecondaryTimer.text
+            val StrsDateHistory = SecondaryTimer.text.split(":").toTypedArray()
             HoursValue = StrsDateHistory[0].toInt()
             MinutesValue = StrsDateHistory[1].toInt()
             SecondsValue = StrsDateHistory[2].toInt()
@@ -204,5 +235,20 @@ class MainActivity : AppCompatActivity() {
             var settings = Intent(this, SettingsActivity::class.java)
             startActivity(settings)
         }
+
+    }
+
+    //Double back to exit
+    private var doubleBackToExitPressedOnce = false
+    override fun onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed()
+            return
+        }
+
+        this.doubleBackToExitPressedOnce = true
+        Toast.makeText(this, "Press again to Exit", Toast.LENGTH_SHORT).show()
+
+        Handler().postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
     }
 }

@@ -7,14 +7,14 @@ import android.os.Handler
 
 class SplashScreen : AppCompatActivity() {
 
-    private val SPLASH_TIME_OUT:Long = 500 // 1 sec
+    private val SPLASH_TIME_OUT:Long = 500
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         Handler().postDelayed({
             startActivity(Intent(this,MainActivity::class.java))
             finish()
-            overridePendingTransition(R.anim.static_animation,R.anim.zoom_out)
+            overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
         }, SPLASH_TIME_OUT)
     }
 }

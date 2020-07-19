@@ -72,12 +72,12 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    //Reset Application TODO
+    //Reset Application
     fun restartApp() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
         finish()
-        overridePendingTransition(R.anim.animation_activity_start,R.anim.animation_activity_end)
+        overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
     }
 }

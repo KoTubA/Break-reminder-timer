@@ -4,15 +4,15 @@
     android:interpolator="@android:anim/accelerate_decelerate_interpolator" >
 
     <scale
-        android:fromXScale="100%"
-        android:fromYScale="100%"
+        android:fromXScale="80%"
+        android:fromYScale="80%"
         android:pivotX="50%"
         android:pivotY="50%"
-        android:toXScale="80%"
-        android:toYScale="80%" />
+        android:toXScale="100%"
+        android:toYScale="100%" />
 
     <alpha
-        android:fromAlpha="1.0"
-        android:toAlpha="0" />
+        android:fromAlpha="0"
+        android:toAlpha="1" />
 
 </set>

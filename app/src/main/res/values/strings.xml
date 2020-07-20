@@ -19,7 +19,11 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Register notification chanel -->
+    <string name="channel_name">my_channel</string>
+    <string name="channel_description">Notification description</string>
+    <string name="channel_id">1</string>
 </resources>

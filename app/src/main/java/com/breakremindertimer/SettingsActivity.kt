@@ -14,7 +14,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
         //Users preference
         val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        var text: String? = themePreference.getString("color_theme", "")
+        var text: String? = themePreference.getString("color_themes", "")
 
         when (text) {
             "AppThemeDark" -> {
@@ -61,10 +61,13 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
     //Listener change user preference
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (key == "color_theme") {
+        if (key == "color_themes") {
             restartApp()
         }
     }
+
+    //Listener click user preference
+    
 
     //Unregister listener
     override fun onDestroy() {

@@ -1,7 +1,11 @@
 package com.breakremindertimer
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -9,6 +13,8 @@ import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.set_time.view.*
@@ -34,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
         //Users preference
         val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        val text: String? = themePreference.getString("color_theme", "")
+        val text: String? = themePreference.getString("color_themes", "")
 
         when (text) {
             "AppThemeDark" -> {
@@ -46,6 +52,27 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 setTheme(R.style.AppTheme_NoActionBar)
             }
+        }
+
+        //Register notification chanel - API26+
+
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        val name = getString(R.string.channel_name)
+        val descriptionText = getString(R.string.channel_description)
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        lateinit var notificationManager: NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(getString(R.string.channel_id), name, importance).apply {
+                description = descriptionText
+            }
+
+            channel.vibrationPattern = longArrayOf(0)
+            channel.enableVibration(true)
+            // Register the channel with the system
+            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
 
         super.onCreate(savedInstanceState)
@@ -80,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             if (SecondsValue >= 0 && SecondsValue < 10) SecondsText = "0${SecondsValue}"
             else SecondsText = SecondsValue.toString()
 
-            MainTimer.setText("$HoursText:$MinutesText:$SecondsText")
+            MainTimer.text = "$HoursText:$MinutesText:$SecondsText"
 
             //Set progress timer
             time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
@@ -89,7 +116,8 @@ class MainActivity : AppCompatActivity() {
 
         //Load watch data when starting the application
         setData()
-        SecondaryTimer.setText("$HoursText:$MinutesText:$SecondsText")
+        SecondaryTimer.text = "$HoursText:$MinutesText:$SecondsText"
+
 
         addTime.setOnClickListener {
             if(counting) {
@@ -103,9 +131,9 @@ class MainActivity : AppCompatActivity() {
             dialog.setTitle(R.string.dialog_title)
             dialog.setView(dialogView)
 
-            var hours = dialogView.numpicker_hours
-            var minutes = dialogView.numpicker_minutes
-            var seconds = dialogView.numpicker_seconds
+            val hours = dialogView.numpicker_hours
+            val minutes = dialogView.numpicker_minutes
+            val seconds = dialogView.numpicker_seconds
 
             //Set attributes NumberPicker
             val StrsDate = SecondaryTimer.text.split(":").toTypedArray()
@@ -142,7 +170,7 @@ class MainActivity : AppCompatActivity() {
                 setData()
 
                 //Secondary timer
-                SecondaryTimer.setText("$HoursText:$MinutesText:$SecondsText")
+                SecondaryTimer.text = "$HoursText:$MinutesText:$SecondsText"
             }
             dialog.setNegativeButton("CANCEL") { _: DialogInterface, _: Int -> }
 
@@ -176,14 +204,41 @@ class MainActivity : AppCompatActivity() {
             counting = true
             Thread.sleep(500)
             time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+
+            //Notification Builder
+            val builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
+                setContentTitle("Picture Download")
+                setContentText("Download in progress")
+                    .setSmallIcon(R.drawable.icon)
+                    .setContentTitle("Time left:")
+                    .setContentText("$HoursText h $MinutesText min $SecondsText sec")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setVibrate(longArrayOf(0))
+                    .setOngoing(true)
+            }
+            val PROGRESS_MAX = time.toInt()
+            var PROGRESS_CURRENT = time.toInt()
+            NotificationManagerCompat.from(this)
+
+            fun updateNotificationProgress() {
+                PROGRESS_CURRENT = time.toInt()
+                builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+                builder.setContentText("$HoursText h $MinutesText min $SecondsText sec")
+                notificationManager.notify(1, builder.build())
+            }
+
             timer = object: CountDownTimer(time*1000-1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     updateCountDownText()
+                    updateNotificationProgress()
                 }
 
                 override fun onFinish() {
                     progressBar.progress = 0
-                    MainTimer.setText("Koniec")
+                    MainTimer.text = "Koniec"
+                    builder.setProgress(0, 0, false).setContentTitle("Time's Up!").setContentText("Click here to see details.")
+                    notificationManager.notify(1, builder.build())
                 }
             }.start()
         }
@@ -206,9 +261,9 @@ class MainActivity : AppCompatActivity() {
             SecondsValue = StrsDateHistory[2].toInt()
 
             time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+            progressBar.progress = time.toInt()
 
-            if (time.toInt() == 0) progressBar.progress = progressBar.max
-            else progressBar.progress = time.toInt()
+            notificationManager.cancel(1)
         }
 
 
@@ -232,7 +287,7 @@ class MainActivity : AppCompatActivity() {
 
         //Button that open settings activity
         OpenSettings.setOnClickListener {
-            var settings = Intent(this, SettingsActivity::class.java)
+            val settings = Intent(this, SettingsActivity::class.java)
             startActivity(settings)
         }
 

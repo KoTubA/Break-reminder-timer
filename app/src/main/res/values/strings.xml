@@ -23,7 +23,7 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <!-- Register notification chanel -->
-    <string name="channel_name">my_channel</string>
-    <string name="channel_description">Notification description</string>
-    <string name="channel_id">1</string>
+    <string name="channel_name">Show countdown status</string>
+    <string name="channel_description">Track and edit your countdown progress</string>
+    <string name="channel_id">1235</string>
 </resources>

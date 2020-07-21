@@ -2,6 +2,7 @@ package com.breakremindertimer
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.set_time.view.*
@@ -23,6 +25,7 @@ import kotlinx.android.synthetic.main.set_time.view.*
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        //TODO Bad background title bar when when the application is minimized (First launch)
         //Load user Preference related to time
         val PREFS_NAME = "MyPrefsFile"
         val settings = getSharedPreferences(PREFS_NAME, 0)
@@ -64,12 +67,12 @@ class MainActivity : AppCompatActivity() {
         lateinit var notificationManager: NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(getString(R.string.channel_id), name, importance).apply {
-                description = descriptionText
-            }
+            val channel = NotificationChannel(getString(R.string.channel_id), name, importance)
 
+            channel.description = descriptionText
             channel.vibrationPattern = longArrayOf(0)
-            channel.enableVibration(true)
+            channel.enableVibration(false)
+            channel.setSound(null,null)
             // Register the channel with the system
             notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -205,17 +208,39 @@ class MainActivity : AppCompatActivity() {
             Thread.sleep(500)
             time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
 
+            //PendingIntent
+            //open MainActivity on by tapping notification
+            var mainIntent = Intent(this, MainActivity::class.java)
+            mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            val mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val startTimer = Intent(this, ActionReceiver::class.java)
+            startTimer.putExtra("action","startTimer");
+            val startTimerPendingIntent = PendingIntent.getBroadcast(this, 1, startTimer, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val pauseTimer = Intent(this, ActionReceiver::class.java)
+            pauseTimer.putExtra("action","pauseTimer");
+            val pauseTimerPendingIntent = PendingIntent.getBroadcast(this, 2, pauseTimer, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val resetTimer = Intent(this, ActionReceiver::class.java)
+            resetTimer.putExtra("action","resetTimer");
+            val resetTimerPendingIntent = PendingIntent.getBroadcast(this, 3, resetTimer, PendingIntent.FLAG_UPDATE_CURRENT)
+
             //Notification Builder
             val builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
-                setContentTitle("Picture Download")
-                setContentText("Download in progress")
-                    .setSmallIcon(R.drawable.icon)
-                    .setContentTitle("Time left:")
-                    .setContentText("$HoursText h $MinutesText min $SecondsText sec")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                    .setVibrate(longArrayOf(0))
-                    .setOngoing(true)
+                    setSmallIcon(R.drawable.ic_baseline_alarm_24)
+                    setContentTitle("Time left:")
+                    setContentText("$HoursText h $MinutesText min $SecondsText sec")
+                    setColor(ContextCompat.getColor(applicationContext, R.color.colorSecondary))
+                    setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    setVibrate(longArrayOf(0))
+                    setOnlyAlertOnce(true)
+                    setOngoing(true)
+                    setContentIntent(mainPendingIntent)
+                    addAction(0,"START", startTimerPendingIntent)
+                    addAction(0,"PAUSE", pauseTimerPendingIntent)
+                    addAction(0,"STOP", resetTimerPendingIntent)
             }
             val PROGRESS_MAX = time.toInt()
             var PROGRESS_CURRENT = time.toInt()
@@ -292,6 +317,12 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+
+
+
+
+
 
     //Double back to exit
     private var doubleBackToExitPressedOnce = false

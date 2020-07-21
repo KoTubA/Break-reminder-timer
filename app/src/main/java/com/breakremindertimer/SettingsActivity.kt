@@ -14,9 +14,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
         //Users preference
         val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        var text: String? = themePreference.getString("color_themes", "")
-
-        when (text) {
+        when (themePreference.getString("color_themes", "")) {
             "AppThemeDark" -> {
                 setTheme(R.style.AppThemeDark)
             }

@@ -108,35 +108,15 @@ class AlarmActivity : AppCompatActivity() {
             }
         }
 
-        counter = object : CountDownTimer(ringDuration, 1000) {
+        //Ignore first tick
+        var first:Boolean = true
+        counter = object : CountDownTimer(ringDuration+1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                if(SecondsValue<59) {
-                    SecondsValue++
+                if (first) {
+                    first = false
+                    return
                 }
-                else {
-                    if(MinutesValue<59) {
-                        SecondsValue = 0
-                        MinutesValue++
-                    }
-                    else {
-                        if(HoursValue<59) {
-                            SecondsValue = 0
-                            MinutesValue = 0
-                            HoursValue++
-                        }
-                    }
-                }
-
-                if (HoursValue >= 0 && HoursValue < 10) HoursText = "0${HoursValue}"
-                else HoursText = HoursValue.toString()
-
-                if (MinutesValue >= 0 && MinutesValue < 10) MinutesText = "0${MinutesValue}"
-                else MinutesText = MinutesValue.toString()
-
-                if (SecondsValue >= 0 && SecondsValue < 10) SecondsText = "0${SecondsValue}"
-                else SecondsText = SecondsValue.toString()
-
-                AlarmTimer.text = "-$HoursText:$MinutesText:$SecondsText"
+                refreshData()
                 blinkProgressBar()
             }
             override fun onFinish() {
@@ -145,13 +125,43 @@ class AlarmActivity : AppCompatActivity() {
         }.start()
     }
 
+    private fun refreshData() {
+        if(SecondsValue<59) {
+            SecondsValue++
+        }
+        else {
+            if(MinutesValue<59) {
+                SecondsValue = 0
+                MinutesValue++
+            }
+            else {
+                if(HoursValue<59) {
+                    SecondsValue = 0
+                    MinutesValue = 0
+                    HoursValue++
+                }
+            }
+        }
+
+        if (HoursValue >= 0 && HoursValue < 10) HoursText = "0${HoursValue}"
+        else HoursText = HoursValue.toString()
+
+        if (MinutesValue >= 0 && MinutesValue < 10) MinutesText = "0${MinutesValue}"
+        else MinutesText = MinutesValue.toString()
+
+        if (SecondsValue >= 0 && SecondsValue < 10) SecondsText = "0${SecondsValue}"
+        else SecondsText = SecondsValue.toString()
+
+        AlarmTimer.text = "-$HoursText:$MinutesText:$SecondsText"
+    }
+
     override fun onBackPressed() {
         counter.cancel()
         returnToMainActivity()
     }
 
     private fun blinkProgressBar() {
-        progressItem.progress = 86400
+        progressItem.progress = 100
         val handler = Handler()
         handler.postDelayed({ progressItem.progress = 0 }, 500)
     }

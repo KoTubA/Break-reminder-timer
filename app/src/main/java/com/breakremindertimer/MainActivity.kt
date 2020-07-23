@@ -1,5 +1,6 @@
 package com.breakremindertimer
 
+import android.animation.ValueAnimator
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,11 +8,9 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.*
+import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -31,16 +30,20 @@ class MainActivity : AppCompatActivity() {
     var MinutesValue: Int = 0
     var SecondsValue: Int = 0
     var time: Long = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+    var staticTime: Long = time
+    var progressWidth: Int = 0
+    var value: Int = 0
 
     //Set default values
     lateinit var HoursText: String
     lateinit var MinutesText: String
     lateinit var SecondsText: String
     lateinit var timer: CountDownTimer
-    var counting:Boolean = false
+    lateinit var animator: ValueAnimator
+    var counting: Boolean = false
 
 
-    lateinit var settings:SharedPreferences
+    lateinit var settings: SharedPreferences
     lateinit var notificationManager: NotificationManager
     lateinit var userPreference: SharedPreferences
 
@@ -105,16 +108,15 @@ class MainActivity : AppCompatActivity() {
         MinutesValue = MinutesPreference
         SecondsValue = SecondsPreference
         time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-        progressBar.max = time.toInt()
 
         //Load watch data when starting the application
         setData()
         SecondaryTimer.text = "$HoursText:$MinutesText:$SecondsText"
 
-
         addTime.setOnClickListener {
             if(counting) {
                 timer.cancel()
+                animator.pause()
                 counting = false
             }
             createCustomDialog()
@@ -122,7 +124,10 @@ class MainActivity : AppCompatActivity() {
 
         //Button that start timer
         StartTime.setOnClickListener {
-            if(!counting) startTimer()
+            if(!counting) {
+                startAnimation(value)
+                startTimer()
+            }
         }
 
         //Button that pause timer
@@ -161,7 +166,6 @@ class MainActivity : AppCompatActivity() {
 
         //Set progress timer
         time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-        progressBar.progress = time.toInt()
     }
 
     private fun createCustomDialog() {
@@ -206,7 +210,8 @@ class MainActivity : AppCompatActivity() {
             SecondsValue = seconds.value
 
             time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-            progressBar.max = time.toInt()
+            progressBar.max = progressBar.width
+            progressBar.progress = progressBar.width
             setData()
 
             //Secondary timer
@@ -242,9 +247,6 @@ class MainActivity : AppCompatActivity() {
     //Creation a timer counting down and start it
     private fun startTimer() {
         counting = true
-        Thread.sleep(500)
-        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-
         //PendingIntent
         //open MainActivity on by tapping notification
         var mainIntent = Intent(this, MainActivity::class.java)
@@ -291,106 +293,25 @@ class MainActivity : AppCompatActivity() {
             notificationManager.notify(1, builder.build())
         }
 
-        timer = object: CountDownTimer(time*1000-1000, 1000) {
+        //Ignore first tick
+        var first:Boolean = true
+        timer = object: CountDownTimer(time*1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
+                if (first) {
+                    first = false
+                    return
+                }
                 updateCountDownText()
                 updateNotificationProgress()
             }
 
             override fun onFinish() {
-                progressBar.progress = 0
                 MainTimer.text = getString(R.string.end_of_countdown)
                 notificationManager.cancel(1)
                 runAlarm()
-                //builder.setProgress(0, 0, false).setContentTitle("Time's Up!").setContentText("Click here to see details.")
-                //notificationManager.notify(1, builder.build())
             }
         }.start()
     }
-
-    private fun alarm() {
-        val am: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val pattern = longArrayOf(500, 500, 500, 500)
-        val mAmplitudes = intArrayOf(0, 255, 0, 255)
-        val ringDuration: Long
-
-        when (userPreference.getString("alarm_duration", "")) {
-            "15s" -> {
-                ringDuration = 15000
-            }
-            "30s" -> {
-                ringDuration = 30000
-            }
-            "1min" -> {
-                ringDuration = 60000
-            }
-            "5min" -> {
-                ringDuration = 300000
-            }
-            "10min" -> {
-                ringDuration = 600000
-            }
-            "15min" -> {
-                ringDuration = 900000
-            }
-            else -> {
-                ringDuration = 60000
-            }
-        }
-
-        lateinit var player: MediaPlayer
-        lateinit var v: Vibrator
-
-        when (am.ringerMode) {
-            AudioManager.RINGER_MODE_NORMAL -> {
-                val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                player = MediaPlayer.create(this, notification)
-                player.isLooping = true
-                player.start()
-
-                if (userPreference.getBoolean("vibrate_switch",true)) {
-                    v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val effect = VibrationEffect.createWaveform(pattern, mAmplitudes, 0)
-                        v.vibrate(effect)
-                    } else {
-                        //deprecated in API 26
-                        v.vibrate(pattern,-1)
-                    }
-                }
-            }
-            else -> {
-                //RINGER_MODE_VIBRATE or RINGER_MODE_SILENT
-                if (userPreference.getBoolean("alarm_switch", true)) {
-                    val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                    player = MediaPlayer.create(this, notification)
-                    player.isLooping = true
-                    player.start()
-                }
-
-                if (userPreference.getBoolean("vibrate_switch",true)) {
-                    v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val effect = VibrationEffect.createWaveform(pattern, mAmplitudes, 0)
-                        v.vibrate(effect)
-                    } else {
-                        //deprecated in API 26
-                        v.vibrate(pattern,-1)
-                    }
-                }
-            }
-        }
-
-        val counter: CountDownTimer = object : CountDownTimer(ringDuration, 1000) {
-            override fun onTick(millisUntilFinished: Long) {}
-            override fun onFinish() {
-                player.stop()
-                v.cancel()
-            }
-        }.start()
-
-    }
-
 
     private fun runAlarm() {
         startActivity(Intent(this, AlarmActivity::class.java))
@@ -401,6 +322,7 @@ class MainActivity : AppCompatActivity() {
     //Pause timer
     private fun pauseTimer() {
         timer.cancel()
+        animator.pause()
     }
 
     //Reset timer and value
@@ -409,6 +331,7 @@ class MainActivity : AppCompatActivity() {
             pauseTimer()
             counting = false
         }
+        animator.pause()
         MainTimer.text = SecondaryTimer.text
         val StrsDateHistory = SecondaryTimer.text.split(":").toTypedArray()
         HoursValue = StrsDateHistory[0].toInt()
@@ -416,7 +339,8 @@ class MainActivity : AppCompatActivity() {
         SecondsValue = StrsDateHistory[2].toInt()
 
         time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-        progressBar.progress = time.toInt()
+        progressBar.progress = progressWidth
+        value = progressWidth
 
         notificationManager.cancel(1)
     }
@@ -438,5 +362,26 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         notificationManager.cancel(1)
+    }
+
+    private fun startAnimation(startValue: Int) {
+        var startValue = startValue
+        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+
+        progressWidth = progressBar.width
+        progressBar.max = progressWidth
+
+        //Zero protection and first run support (progressBar.with doesn't work in the function onCreate())
+        if(value==0) startValue = progressWidth
+
+        animator = ValueAnimator.ofInt(startValue, 0)
+        animator.interpolator = LinearInterpolator()
+        animator.startDelay = 0
+        animator.duration = time*1000
+        animator.addUpdateListener { valueAnimator ->
+            value = valueAnimator.animatedValue as Int
+            progressBar.progress = value
+        }
+        animator.start()
     }
 }

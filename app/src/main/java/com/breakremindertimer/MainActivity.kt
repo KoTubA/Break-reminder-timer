@@ -7,10 +7,11 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Handler
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.*
 import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -41,10 +42,24 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var settings:SharedPreferences
     lateinit var notificationManager: NotificationManager
+    lateinit var userPreference: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        //TODO Bad background title bar when when the application is minimized (First launch)
+        //Set users preference theme
+        userPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        when (userPreference.getString("color_themes", "")) {
+            "AppThemeDark" -> {
+                setTheme(R.style.AppTheme_NoActionBarDark)
+            }
+            "AppThemeBlackAndWhite" -> {
+                setTheme(R.style.AppTheme_NoActionBarBlackAndWhite)
+            }
+            else -> {
+                setTheme(R.style.AppTheme_NoActionBar)
+            }
+        }
+
         //Load user Preference related to time
         val PREFS_NAME = "MyPrefsFile"
         settings = getSharedPreferences(PREFS_NAME, 0)
@@ -60,22 +75,7 @@ class MainActivity : AppCompatActivity() {
             values.apply()
         }
 
-        //Users preference
-        val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        when (themePreference.getString("color_themes", "")) {
-            "AppThemeDark" -> {
-                setTheme(R.style.AppTheme_NoActionBarDark)
-            }
-            "AppThemeBlackAndWhite" -> {
-                setTheme(R.style.AppTheme_NoActionBarBlackAndWhite)
-            }
-            else -> {
-                setTheme(R.style.AppTheme_NoActionBar)
-            }
-        }
-
         //Register notification chanel - API26+
-
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         val name = getString(R.string.channel_name)
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun setData() {
+    private fun setData() {
         //Set main timer and progress bar
         if (HoursValue >= 0 && HoursValue < 10) HoursText = "0${HoursValue}"
         else HoursText = HoursValue.toString()
@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         progressBar.progress = time.toInt()
     }
 
-    fun createCustomDialog() {
+    private fun createCustomDialog() {
         //Creation dialog with NumberPicker
         val dialog = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.set_time, null)
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Update timer, then call to setData()
-    fun updateCountDownText() {
+    private fun updateCountDownText() {
         if(SecondsValue>0) {
             SecondsValue--
         }
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Creation a timer counting down and start it
-    fun startTimer() {
+    private fun startTimer() {
         counting = true
         Thread.sleep(500)
         time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity() {
         var mainIntent = Intent(this, MainActivity::class.java)
         mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
+        /*
         val startTimer = Intent(this, ActionReceiver::class.java)
         startTimer.putExtra("action","startTimer");
         val startTimerPendingIntent = PendingIntent.getBroadcast(this, 1, startTimer, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -262,6 +262,7 @@ class MainActivity : AppCompatActivity() {
         val resetTimer = Intent(this, ActionReceiver::class.java)
         resetTimer.putExtra("action","resetTimer");
         val resetTimerPendingIntent = PendingIntent.getBroadcast(this, 3, resetTimer, PendingIntent.FLAG_UPDATE_CURRENT)
+        */
 
         //Notification Builder
         val builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
@@ -275,9 +276,9 @@ class MainActivity : AppCompatActivity() {
             setOnlyAlertOnce(true)
             setOngoing(true)
             setContentIntent(mainPendingIntent)
-            addAction(0,"START", startTimerPendingIntent)
-            addAction(0,"PAUSE", pauseTimerPendingIntent)
-            addAction(0,"STOP", resetTimerPendingIntent)
+            //addAction(0,"START", startTimerPendingIntent)
+            //addAction(0,"PAUSE", pauseTimerPendingIntent)
+            //addAction(0,"STOP", resetTimerPendingIntent)
         }
         val PROGRESS_MAX = time.toInt()
         var PROGRESS_CURRENT = time.toInt()
@@ -298,20 +299,112 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 progressBar.progress = 0
-                MainTimer.text = "Koniec"
-                builder.setProgress(0, 0, false).setContentTitle("Time's Up!").setContentText("Click here to see details.")
-                notificationManager.notify(1, builder.build())
+                MainTimer.text = getString(R.string.end_of_countdown)
+                notificationManager.cancel(1)
+                runAlarm()
+                //builder.setProgress(0, 0, false).setContentTitle("Time's Up!").setContentText("Click here to see details.")
+                //notificationManager.notify(1, builder.build())
             }
         }.start()
     }
 
+    private fun alarm() {
+        val am: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val pattern = longArrayOf(500, 500, 500, 500)
+        val mAmplitudes = intArrayOf(0, 255, 0, 255)
+        val ringDuration: Long
+
+        when (userPreference.getString("alarm_duration", "")) {
+            "15s" -> {
+                ringDuration = 15000
+            }
+            "30s" -> {
+                ringDuration = 30000
+            }
+            "1min" -> {
+                ringDuration = 60000
+            }
+            "5min" -> {
+                ringDuration = 300000
+            }
+            "10min" -> {
+                ringDuration = 600000
+            }
+            "15min" -> {
+                ringDuration = 900000
+            }
+            else -> {
+                ringDuration = 60000
+            }
+        }
+
+        lateinit var player: MediaPlayer
+        lateinit var v: Vibrator
+
+        when (am.ringerMode) {
+            AudioManager.RINGER_MODE_NORMAL -> {
+                val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                player = MediaPlayer.create(this, notification)
+                player.isLooping = true
+                player.start()
+
+                if (userPreference.getBoolean("vibrate_switch",true)) {
+                    v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val effect = VibrationEffect.createWaveform(pattern, mAmplitudes, 0)
+                        v.vibrate(effect)
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(pattern,-1)
+                    }
+                }
+            }
+            else -> {
+                //RINGER_MODE_VIBRATE or RINGER_MODE_SILENT
+                if (userPreference.getBoolean("alarm_switch", true)) {
+                    val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                    player = MediaPlayer.create(this, notification)
+                    player.isLooping = true
+                    player.start()
+                }
+
+                if (userPreference.getBoolean("vibrate_switch",true)) {
+                    v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val effect = VibrationEffect.createWaveform(pattern, mAmplitudes, 0)
+                        v.vibrate(effect)
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(pattern,-1)
+                    }
+                }
+            }
+        }
+
+        val counter: CountDownTimer = object : CountDownTimer(ringDuration, 1000) {
+            override fun onTick(millisUntilFinished: Long) {}
+            override fun onFinish() {
+                player.stop()
+                v.cancel()
+            }
+        }.start()
+
+    }
+
+
+    private fun runAlarm() {
+        startActivity(Intent(this, AlarmActivity::class.java))
+        overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
+        finish()
+    }
+
     //Pause timer
-    fun pauseTimer() {
+    private fun pauseTimer() {
         timer.cancel()
     }
 
     //Reset timer and value
-    fun resetTimer() {
+    private fun resetTimer() {
         if(counting) {
             pauseTimer()
             counting = false
@@ -340,5 +433,10 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Press again to Exit", Toast.LENGTH_SHORT).show()
 
         Handler().postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        notificationManager.cancel(1)
     }
 }

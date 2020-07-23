@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:scrollbars="none"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="90dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBarTimer"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/bg_timer"
+                android:indeterminate="false"
+                android:max="86400"
+                android:progress="86400"
+                android:progressDrawable="@drawable/status_bar"
+                android:rotation="-90" />
+
+            <TextView
+                android:id="@+id/AlarmTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="00:00:00"
+                android:textSize="46sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp">
+
+                <TextView
+                    android:id="@+id/Hours_short_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="80dp"
+                    android:paddingRight="30dp"
+                    android:text="@string/hours_short"
+                    android:textColor="?attr/timerSecondColor"
+                    android:textSize="9sp" />
+
+                <TextView
+                    android:id="@+id/Minutes_short_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="80dp"
+                    android:paddingRight="30dp"
+                    android:text="@string/minutes_short"
+                    android:textColor="?attr/timerSecondColor"
+                    android:textSize="9sp" />
+
+                <TextView
+                    android:id="@+id/Seconds_short_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="30dp"
+                    android:paddingTop="80dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/seconds_short"
+                    android:textColor="?attr/timerSecondColor"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/AlarmDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:textColor="?attr/timerSecondColor" />
+
+            <ImageButton
+                android:id="@+id/stopAlarm"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/main_rounded_button"
+                android:src="@drawable/ic_baseline_stop_24"
+                android:tint="?attr/SecondaryTextColor" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

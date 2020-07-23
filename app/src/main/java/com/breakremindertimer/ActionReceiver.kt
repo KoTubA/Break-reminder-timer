@@ -9,7 +9,6 @@ import android.widget.Toast
 class ActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
-        val MainActivity = MainActivity()
         //Toast.makeText(context,"recieved",Toast.LENGTH_SHORT).show();
         val action = intent.getStringExtra("action")
         if (action == "startTimer") {

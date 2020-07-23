@@ -11,21 +11,21 @@
         <item>AppThemeBlackAndWhite</item>
     </string-array>
 
-    <string-array name="ring_duration_list">
+    <string-array name="alarm_duration_list">
+        <item>15 seconds</item>
+        <item>30 seconds</item>
         <item>1 minute</item>
         <item>5 minutes</item>
         <item>10 minutes</item>
         <item>15 minutes</item>
-        <item>20 minutes</item>
-        <item>30 minutes</item>
     </string-array>
 
-    <string-array name="ring_duration_values">
-        <item>1</item>
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
-        <item>20</item>
-        <item>30</item>
+    <string-array name="alarm_duration_values">
+        <item>15s</item>
+        <item>30s</item>
+        <item>1min</item>
+        <item>5min</item>
+        <item>10min</item>
+        <item>15min</item>
     </string-array>
 </resources>

@@ -64,9 +64,6 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
     }
 
-    //Listener click user preference
-    
-
     //Unregister listener
     override fun onDestroy() {
         super.onDestroy()
@@ -74,7 +71,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     }
 
     //Reset Application
-    fun restartApp() {
+    private fun restartApp() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)

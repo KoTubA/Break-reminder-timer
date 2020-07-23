@@ -18,17 +18,6 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Timer">
-
-        <Preference
-            android:focusableInTouchMode="false"
-            app:icon="@drawable/ic_baseline_music_note_24"
-            app:key="ringtone_picker"
-            app:title="Ringtone"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
     <PreferenceCategory app:title="Alarms">
 
         <SwitchPreferenceCompat
@@ -36,15 +25,15 @@
             app:icon="@drawable/ic_baseline_alarm_24"
             app:key="alarm_switch"
             app:title="Alarm in silent mode"
-            android:summary="Play alarm even when the phone is in silent mode"/>
+            android:summary="Play alarm even when the phone is in vibrate or silent mode"/>
 
         <ListPreference
             android:focusableInTouchMode="false"
-            app:defaultValue="5"
-            app:entries="@array/ring_duration_list"
-            app:entryValues="@array/ring_duration_values"
+            app:defaultValue="1min"
+            app:entries="@array/alarm_duration_list"
+            app:entryValues="@array/alarm_duration_values"
             app:icon="@drawable/ic_baseline_update_24"
-            app:key="ring_duration"
+            app:key="alarm_duration"
             app:title="Ring duration"
             app:useSimpleSummaryProvider="true" />
 

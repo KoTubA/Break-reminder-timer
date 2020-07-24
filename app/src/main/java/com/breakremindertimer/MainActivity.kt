@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
         //Button that start timer
         StartTime.setOnClickListener {
             if(!counting) {
+                counting = true
                 startAnimation(value)
                 startTimer()
             }
@@ -163,9 +164,6 @@ class MainActivity : AppCompatActivity() {
         else SecondsText = SecondsValue.toString()
 
         MainTimer.text = "$HoursText:$MinutesText:$SecondsText"
-
-        //Set progress timer
-        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
     }
 
     private fun createCustomDialog() {
@@ -224,29 +222,15 @@ class MainActivity : AppCompatActivity() {
 
     //Update timer, then call to setData()
     private fun updateCountDownText() {
-        if(SecondsValue>0) {
-            SecondsValue--
-        }
-        else {
-            if(MinutesValue>0) {
-                SecondsValue = 59
-                MinutesValue--
-            }
-            else {
-                if(HoursValue>0) {
-                    SecondsValue = 59
-                    MinutesValue = 59
-                    HoursValue--
-                }
 
-            }
-        }
+        HoursValue= ((time/1000)/3600).toInt()
+        MinutesValue= ((time/1000)/60).toInt()
+        SecondsValue = ((time/1000)%60).toInt()
         setData()
     }
 
     //Creation a timer counting down and start it
     private fun startTimer() {
-        counting = true
         //PendingIntent
         //open MainActivity on by tapping notification
         var mainIntent = Intent(this, MainActivity::class.java)
@@ -293,14 +277,10 @@ class MainActivity : AppCompatActivity() {
             notificationManager.notify(1, builder.build())
         }
 
-        //Ignore first tick
-        var first:Boolean = true
+        //TODO 1 second delay
         timer = object: CountDownTimer(time*1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                if (first) {
-                    first = false
-                    return
-                }
+                time = millisUntilFinished
                 updateCountDownText()
                 updateNotificationProgress()
             }
@@ -314,8 +294,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun runAlarm() {
-        startActivity(Intent(this, AlarmActivity::class.java))
-        overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
+        //Check if AlarmActivity is running
+        if(AlarmActivity.active) {
+            startActivity(Intent(this, AlarmActivity::class.java))
+            overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
+        }
         finish()
     }
 

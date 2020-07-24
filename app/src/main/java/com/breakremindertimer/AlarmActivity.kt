@@ -17,6 +17,10 @@ import kotlinx.android.synthetic.main.activity_alarm.*
 
 
 class AlarmActivity : AppCompatActivity() {
+    //Protection against multiple starts of activities
+    companion object {
+        var active: Boolean = true
+    }
 
     lateinit var userPreference: SharedPreferences
     private val pattern = longArrayOf(500, 500, 500, 500)
@@ -37,6 +41,8 @@ class AlarmActivity : AppCompatActivity() {
     lateinit var progressItem: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Activity start
+        active = false
         //Users preference
         userPreference = PreferenceManager.getDefaultSharedPreferences(this)
         when (userPreference.getString("color_themes", "")) {
@@ -201,5 +207,9 @@ class AlarmActivity : AppCompatActivity() {
         }
     }
 
-
+    override fun onStop() {
+        super.onStop()
+        //Activity end
+        active = true
+    }
 }

@@ -9,7 +9,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
-import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.NumberPicker
 import android.widget.Toast
@@ -25,11 +24,11 @@ import kotlinx.android.synthetic.main.set_time.view.*
 
 class MainActivity : AppCompatActivity() {
 
-    //Initial timer settings
+    //Initial time settings
     var HoursValue: Int = 15
     var MinutesValue: Int = 0
     var SecondsValue: Int = 0
-    var time: Long = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+    var time: Long = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
     var staticTime: Long = time
     var progressWidth: Int = 0
     var value: Int = 0
@@ -41,6 +40,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var timer: CountDownTimer
     lateinit var animator: ValueAnimator
     var counting: Boolean = false
+
+    //Notification
+    var PROGRESS_MAX = (time/1000).toInt()
+    var PROGRESS_CURRENT = (time/1000).toInt()
+    lateinit var builder: NotificationCompat.Builder
+    var firstStart: Boolean = true
 
 
     lateinit var settings: SharedPreferences
@@ -99,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //Initial timer settings
+        //Initial time settings
         val HoursPreference = settings.getInt("timer_hours",0)
         val MinutesPreference = settings.getInt("timer_minutes",15)
         val SecondsPreference = settings.getInt("timer_seconds",0)
@@ -107,18 +112,19 @@ class MainActivity : AppCompatActivity() {
         HoursValue = HoursPreference
         MinutesValue = MinutesPreference
         SecondsValue = SecondsPreference
-        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+        time = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
 
         //Load watch data when starting the application
         setData()
         SecondaryTimer.text = "$HoursText:$MinutesText:$SecondsText"
 
+        //Button that open time picker
         addTime.setOnClickListener {
             if(counting) {
-                timer.cancel()
-                animator.pause()
+                pauseTimer()
                 counting = false
             }
+            firstStart = true
             createCustomDialog()
         }
 
@@ -126,8 +132,8 @@ class MainActivity : AppCompatActivity() {
         StartTime.setOnClickListener {
             if(!counting) {
                 counting = true
-                startAnimation(value)
                 startTimer()
+                startAnimation(value)
             }
         }
 
@@ -141,6 +147,9 @@ class MainActivity : AppCompatActivity() {
 
         //Button that reset timer
         ResetTimer.setOnClickListener {
+            if(counting) {
+                counting = false
+            }
             resetTimer()
         }
 
@@ -150,20 +159,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(settings)
         }
 
-    }
-
-    private fun setData() {
-        //Set main timer and progress bar
-        if (HoursValue >= 0 && HoursValue < 10) HoursText = "0${HoursValue}"
-        else HoursText = HoursValue.toString()
-
-        if (MinutesValue >= 0 && MinutesValue < 10) MinutesText = "0${MinutesValue}"
-        else MinutesText = MinutesValue.toString()
-
-        if (SecondsValue >= 0 && SecondsValue < 10) SecondsText = "0${SecondsValue}"
-        else SecondsText = SecondsValue.toString()
-
-        MainTimer.text = "$HoursText:$MinutesText:$SecondsText"
     }
 
     private fun createCustomDialog() {
@@ -207,12 +202,14 @@ class MainActivity : AppCompatActivity() {
             MinutesValue = minutes.value
             SecondsValue = seconds.value
 
-            time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-            progressBar.max = progressBar.width
-            progressBar.progress = progressBar.width
+            //Set the values in progressBar
+            time = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
+            progressBar.max = time.toInt()
+            progressBar.progress = time.toInt()
+            value = time.toInt()
             setData()
 
-            //Secondary timer
+            //Set the time on the second clock
             SecondaryTimer.text = "$HoursText:$MinutesText:$SecondsText"
         }
         dialog.setNegativeButton("CANCEL") { _: DialogInterface, _: Int -> }
@@ -220,20 +217,105 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    //Update timer, then call to setData()
-    private fun updateCountDownText() {
+    //Creation a timer counting down and start it
+    private fun startTimer() {
+        if(firstStart) {
+            createNotification()
+        }
 
+        timer = object: CountDownTimer(time, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                //1 second delay
+                time = millisUntilFinished+1000
+                //Update main timer
+                updateCountDownText()
+                //Update notification timer
+                updateNotificationProgress()
+            }
+
+            override fun onFinish() {
+                MainTimer.text = getString(R.string.end_of_countdown)
+                notificationManager.cancel(1)
+                runAlarm()
+            }
+        }.start()
+    }
+
+    //Pause timer
+    private fun pauseTimer() {
+        timer.cancel()
+        animator.pause()
+        if(firstStart) {
+            firstStart = false
+        }
+        //Undo the one-second delay (protection against bug timer)
+        time -= 1000
+        value = time.toInt()
+        //progressBar.progress = value
+        pauseProgressBarAnimation(progressBar.progress, value)
+    }
+
+    //Reset timer, value, progressBar and cancel notification
+    private fun resetTimer() {
+        //Stop timer and animation progressBar
+        timer.cancel()
+        animator.pause()
+        //Reset main timer
+        MainTimer.text = SecondaryTimer.text
+        //Get the numbers from the second timer and restore the values
+        val StrsDateHistory = SecondaryTimer.text.split(":").toTypedArray()
+        HoursValue = StrsDateHistory[0].toInt()
+        MinutesValue = StrsDateHistory[1].toInt()
+        SecondsValue = StrsDateHistory[2].toInt()
+
+        //Reset progressBar
+        time = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
+        value = time.toInt()
+        progressBar.max = value
+        progressBar.progress = value
+
+        //Cancel notification and set flag
+        notificationManager.cancel(1)
+        firstStart = true
+    }
+
+    //Function starting when timer is over
+    private fun runAlarm() {
+        //Check if AlarmActivity is running
+        if(AlarmActivity.active) {
+            startActivity(Intent(this, AlarmActivity::class.java))
+            overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
+        }
+        finish()
+    }
+
+    //Update value timer, then call to setData()
+    private fun updateCountDownText() {
         HoursValue= ((time/1000)/3600).toInt()
-        MinutesValue= ((time/1000)/60).toInt()
+        MinutesValue= (((time/1000)%3600)/60).toInt()
         SecondsValue = ((time/1000)%60).toInt()
         setData()
     }
 
-    //Creation a timer counting down and start it
-    private fun startTimer() {
-        //PendingIntent
-        //open MainActivity on by tapping notification
-        var mainIntent = Intent(this, MainActivity::class.java)
+    //Update main timer
+    private fun setData() {
+        if (HoursValue >= 0 && HoursValue < 10) HoursText = "0${HoursValue}"
+        else HoursText = HoursValue.toString()
+
+        if (MinutesValue >= 0 && MinutesValue < 10) MinutesText = "0${MinutesValue}"
+        else MinutesText = MinutesValue.toString()
+
+        if (SecondsValue >= 0 && SecondsValue < 10) SecondsText = "0${SecondsValue}"
+        else SecondsText = SecondsValue.toString()
+
+        MainTimer.text = "$HoursText:$MinutesText:$SecondsText"
+    }
+
+    //Notification
+    private fun createNotification() {
+
+        //Open MainActivity on by tapping notification
+        val mainIntent = Intent(this, MainActivity::class.java)
         mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         /*
@@ -251,7 +333,7 @@ class MainActivity : AppCompatActivity() {
         */
 
         //Notification Builder
-        val builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
+        builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
             setSmallIcon(R.drawable.ic_baseline_alarm_24)
             setContentTitle("Time left:")
             setContentText("$HoursText h $MinutesText min $SecondsText sec")
@@ -266,66 +348,17 @@ class MainActivity : AppCompatActivity() {
             //addAction(0,"PAUSE", pauseTimerPendingIntent)
             //addAction(0,"STOP", resetTimerPendingIntent)
         }
-        val PROGRESS_MAX = time.toInt()
-        var PROGRESS_CURRENT = time.toInt()
+        PROGRESS_MAX = (time/1000).toInt()
+        PROGRESS_CURRENT = (time/1000).toInt()
         NotificationManagerCompat.from(this)
-
-        fun updateNotificationProgress() {
-            PROGRESS_CURRENT = time.toInt()
-            builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
-            builder.setContentText("$HoursText h $MinutesText min $SecondsText sec")
-            notificationManager.notify(1, builder.build())
-        }
-
-        //TODO 1 second delay
-        timer = object: CountDownTimer(time*1000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                time = millisUntilFinished
-                updateCountDownText()
-                updateNotificationProgress()
-            }
-
-            override fun onFinish() {
-                MainTimer.text = getString(R.string.end_of_countdown)
-                notificationManager.cancel(1)
-                runAlarm()
-            }
-        }.start()
     }
 
-    private fun runAlarm() {
-        //Check if AlarmActivity is running
-        if(AlarmActivity.active) {
-            startActivity(Intent(this, AlarmActivity::class.java))
-            overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
-        }
-        finish()
-    }
-
-    //Pause timer
-    private fun pauseTimer() {
-        timer.cancel()
-        animator.pause()
-    }
-
-    //Reset timer and value
-    private fun resetTimer() {
-        if(counting) {
-            pauseTimer()
-            counting = false
-        }
-        animator.pause()
-        MainTimer.text = SecondaryTimer.text
-        val StrsDateHistory = SecondaryTimer.text.split(":").toTypedArray()
-        HoursValue = StrsDateHistory[0].toInt()
-        MinutesValue = StrsDateHistory[1].toInt()
-        SecondsValue = StrsDateHistory[2].toInt()
-
-        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
-        progressBar.progress = progressWidth
-        value = progressWidth
-
-        notificationManager.cancel(1)
+    //Update notification timer and progressBar
+    private fun updateNotificationProgress() {
+        PROGRESS_CURRENT = (time/1000).toInt()
+        builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
+        builder.setContentText("$HoursText h $MinutesText min $SecondsText sec")
+        notificationManager.notify(1, builder.build())
     }
 
     //Double back to exit
@@ -347,24 +380,39 @@ class MainActivity : AppCompatActivity() {
         notificationManager.cancel(1)
     }
 
+    //Start animate progressBar
     private fun startAnimation(startValue: Int) {
-        var startValue = startValue
-        time = (HoursValue*3600)+(MinutesValue*60)+SecondsValue.toLong()
+        if(firstStart) {
+            progressWidth = time.toInt()
+        }
 
-        progressWidth = progressBar.width
+        var startValue = startValue
         progressBar.max = progressWidth
 
-        //Zero protection and first run support (progressBar.with doesn't work in the function onCreate())
-        if(value==0) startValue = progressWidth
+        //Protection against zero "percent"
+        if(value==0) startValue = time.toInt()
 
         animator = ValueAnimator.ofInt(startValue, 0)
         animator.interpolator = LinearInterpolator()
         animator.startDelay = 0
-        animator.duration = time*1000
+        animator.duration = time
         animator.addUpdateListener { valueAnimator ->
             value = valueAnimator.animatedValue as Int
             progressBar.progress = value
         }
         animator.start()
+    }
+
+    private fun pauseProgressBarAnimation(fromProgress: Int, toProgress: Int) {
+        val animatorPause = ValueAnimator.ofInt(fromProgress, toProgress)
+        animatorPause.interpolator = LinearInterpolator()
+        animatorPause.startDelay = 0
+        animatorPause.duration = 200
+        animatorPause.addUpdateListener { valueAnimator ->
+            value = valueAnimator.animatedValue as Int
+            progressBar.progress = value
+        }
+
+        animatorPause.start()
     }
 }

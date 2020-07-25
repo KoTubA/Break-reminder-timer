@@ -60,8 +60,8 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/bg_timer"
                 android:indeterminate="false"
-                android:max="86400"
-                android:progress="86400"
+                android:max="86399000"
+                android:progress="86400000"
                 android:progressDrawable="@drawable/status_bar"
                 android:rotation="-90" />
 

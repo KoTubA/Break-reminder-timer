@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.set_time.view.*
+import kotlin.math.ceil
+import kotlin.math.round
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     var MinutesValue: Int = 0
     var SecondsValue: Int = 0
     var time: Long = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
-    var staticTime: Long = time
     var progressWidth: Int = 0
     var value: Int = 0
 
@@ -113,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         MinutesValue = MinutesPreference
         SecondsValue = SecondsPreference
         time = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
+        progressBar.max = time.toInt()
+        progressBar.progress = time.toInt()
 
         //Load watch data when starting the application
         setData()
@@ -250,16 +253,17 @@ class MainActivity : AppCompatActivity() {
         }
         //Undo the one-second delay (protection against bug timer)
         time -= 1000
+        // Round off numbers returned by countDownTimer, like: (99997~10000)
+        time = (round(time.toDouble()/1000) *1000).toLong()
         value = time.toInt()
-        //progressBar.progress = value
         pauseProgressBarAnimation(progressBar.progress, value)
     }
 
     //Reset timer, value, progressBar and cancel notification
     private fun resetTimer() {
         //Stop timer and animation progressBar
-        timer.cancel()
-        animator.pause()
+        if(this::timer.isInitialized) timer.cancel()
+        if(this::animator.isInitialized) animator.pause()
         //Reset main timer
         MainTimer.text = SecondaryTimer.text
         //Get the numbers from the second timer and restore the values

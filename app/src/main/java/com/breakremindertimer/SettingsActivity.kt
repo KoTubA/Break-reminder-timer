@@ -55,8 +55,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
         return super.onOptionsItemSelected(item)
     }
-
-
+    
     //Listener change user preference
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "color_themes") {

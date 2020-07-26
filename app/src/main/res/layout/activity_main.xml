@@ -127,7 +127,6 @@
             android:id="@+id/linearLayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -135,7 +134,8 @@
                 android:id="@+id/SecondaryTimer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
                 android:gravity="center"
                 android:text="00:15:00"
                 android:textColor="?attr/timerSecondColor" />
@@ -145,8 +145,7 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:background="@drawable/main_rounded_button"
-                android:src="@drawable/ic_baseline_add_24"
-                android:tint="?attr/SecondaryTextColor" />
+                android:src="@drawable/ic_baseline_add_24" />
 
         </LinearLayout>
 
@@ -154,7 +153,7 @@
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="25dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -165,8 +164,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/main_rounded_button"
-                android:src="@drawable/ic_baseline_play_arrow_24"
-                android:tint="?attr/SecondaryTextColor" />
+                android:src="@drawable/ic_baseline_play_arrow_24" />
 
             <ImageButton
                 android:id="@+id/PauseTimer"
@@ -174,9 +172,8 @@
                 android:layout_height="45dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@drawable/main_rounded_button"
-                android:src="@drawable/ic_baseline_pause_24"
-                android:tint="?attr/SecondaryTextColor" />
+                android:background="@drawable/main_rounded_button_disable"
+                android:src="@drawable/ic_baseline_pause_24_2" />
 
             <ImageButton
                 android:id="@+id/ResetTimer"
@@ -185,8 +182,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/main_rounded_button"
-                android:src="@drawable/ic_baseline_refresh_24"
-                android:tint="?attr/SecondaryTextColor" />
+                android:src="@drawable/ic_baseline_refresh_24" />
         </LinearLayout>
 
     </LinearLayout>

@@ -124,10 +124,13 @@ class MainActivity : AppCompatActivity() {
         //Button that open time picker
         addTime.setOnClickListener {
             if(counting) {
-                pauseTimer()
                 counting = false
+                StartTime.setBackgroundResource(R.drawable.main_rounded_button)
+                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
+                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
+                pauseTimer()
             }
-            firstStart = true
             createCustomDialog()
         }
 
@@ -135,6 +138,10 @@ class MainActivity : AppCompatActivity() {
         StartTime.setOnClickListener {
             if(!counting) {
                 counting = true
+                StartTime.setBackgroundResource(R.drawable.main_rounded_button_disable)
+                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24_2)
+                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button)
+                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24)
                 startTimer()
                 startAnimation(value)
             }
@@ -143,6 +150,10 @@ class MainActivity : AppCompatActivity() {
         //Button that pause timer
         PauseTimer.setOnClickListener {
             if(counting) {
+                StartTime.setBackgroundResource(R.drawable.main_rounded_button)
+                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
+                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
                 pauseTimer()
                 counting = false
             }
@@ -151,6 +162,10 @@ class MainActivity : AppCompatActivity() {
         //Button that reset timer
         ResetTimer.setOnClickListener {
             if(counting) {
+                StartTime.setBackgroundResource(R.drawable.main_rounded_button)
+                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
+                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
                 counting = false
             }
             resetTimer()
@@ -194,6 +209,8 @@ class MainActivity : AppCompatActivity() {
 
 
         dialog.setPositiveButton("SET TIME") { _: DialogInterface, _: Int ->
+            firstStart = true
+            notificationManager.cancel(1)
             //Save data to Preference
             val values = settings.edit()
             values.putInt("timer_hours",hours.value)
@@ -253,9 +270,8 @@ class MainActivity : AppCompatActivity() {
         }
         //Undo the one-second delay (protection against bug timer)
         time -= 1000
-        // Round off numbers returned by countDownTimer, like: (99997~10000)
-        time = (round(time.toDouble()/1000) *1000).toLong()
-        value = time.toInt()
+        // Round off numbers returned by countDownTimer, like: (99997~10000) - only for animation
+        value = (round(time.toDouble()/1000) *1000).toInt()
         pauseProgressBarAnimation(progressBar.progress, value)
     }
 

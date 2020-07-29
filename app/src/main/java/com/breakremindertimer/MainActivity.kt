@@ -1,59 +1,53 @@
 package com.breakremindertimer
 
 import android.animation.ValueAnimator
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.os.*
+import android.util.Log
 import android.view.animation.LinearInterpolator
 import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.set_time.view.*
-import kotlin.math.ceil
 import kotlin.math.round
 
 
 class MainActivity : AppCompatActivity() {
 
     //Initial time settings
-    var HoursValue: Int = 15
-    var MinutesValue: Int = 0
-    var SecondsValue: Int = 0
-    var time: Long = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
+    companion object {
+        var HoursValue: Int = 15
+        var MinutesValue: Int = 0
+        var SecondsValue: Int = 0
+        var time: Long = ((HoursValue*3600)+(MinutesValue*60)+SecondsValue)*1000.toLong()
+
+        lateinit var HoursText: String
+        lateinit var MinutesText: String
+        lateinit var SecondsText: String
+    }
+
+    //Set default values
+    var counting: Boolean = false
+    var firstStart: Boolean = true
+    var startTimer: Boolean = false
+    lateinit var animator: ValueAnimator
+
+    //ProgressBar default values
     var progressWidth: Int = 0
     var value: Int = 0
 
-    //Set default values
-    lateinit var HoursText: String
-    lateinit var MinutesText: String
-    lateinit var SecondsText: String
-    lateinit var timer: CountDownTimer
-    lateinit var animator: ValueAnimator
-    var counting: Boolean = false
-
-    //Notification
-    var PROGRESS_MAX = (time/1000).toInt()
-    var PROGRESS_CURRENT = (time/1000).toInt()
-    lateinit var builder: NotificationCompat.Builder
-    var firstStart: Boolean = true
-
-
     lateinit var settings: SharedPreferences
-    lateinit var notificationManager: NotificationManager
     lateinit var userPreference: SharedPreferences
+    //Service
+    lateinit var intentService: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        intentService = Intent(this, MyService::class.java)
+        val filter = IntentFilter("com.action")
+        registerReceiver(broadcastReceiver, filter)
 
         //Set users preference theme
         userPreference = PreferenceManager.getDefaultSharedPreferences(this)
@@ -82,24 +76,6 @@ class MainActivity : AppCompatActivity() {
             values.putInt("timer_minutes",15)
             values.putInt("timer_seconds",0)
             values.apply()
-        }
-
-        //Register notification chanel - API26+
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        val name = getString(R.string.channel_name)
-        val descriptionText = getString(R.string.channel_description)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(getString(R.string.channel_id), name, NotificationManager.IMPORTANCE_DEFAULT)
-
-            channel.description = descriptionText
-            channel.vibrationPattern = longArrayOf(0)
-            channel.enableVibration(false)
-            channel.setSound(null,null)
-            // Register the channel with the system
-            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
 
         super.onCreate(savedInstanceState)
@@ -137,37 +113,19 @@ class MainActivity : AppCompatActivity() {
         //Button that start timer
         StartTime.setOnClickListener {
             if(!counting) {
-                counting = true
-                StartTime.setBackgroundResource(R.drawable.main_rounded_button_disable)
-                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24_2)
-                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button)
-                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24)
                 startTimer()
-                startAnimation(value)
             }
         }
 
         //Button that pause timer
         PauseTimer.setOnClickListener {
             if(counting) {
-                StartTime.setBackgroundResource(R.drawable.main_rounded_button)
-                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
-                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
                 pauseTimer()
-                counting = false
             }
         }
 
         //Button that reset timer
         ResetTimer.setOnClickListener {
-            if(counting) {
-                StartTime.setBackgroundResource(R.drawable.main_rounded_button)
-                StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-                PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
-                PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
-                counting = false
-            }
             resetTimer()
         }
 
@@ -177,6 +135,54 @@ class MainActivity : AppCompatActivity() {
             startActivity(settings)
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(startTimer) {
+            MyService.notificationManager.cancel(1)
+        }
+        stopService(intentService)
+        unregisterReceiver(broadcastReceiver)
+    }
+
+    //Broadcast
+    val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+
+            //Toast.makeText(context,"recieved",Toast.LENGTH_SHORT).show();
+            val action = intent.getStringExtra("action")
+            when (action) {
+                "Counter" -> {
+                    //Update main timer
+                    updateCountDownText()
+                    //Update notification timer
+                    updateNotificationProgress()
+                }
+                "Alarm" -> {
+                    MainTimer.text = getString(R.string.end_of_countdown)
+                    MyService.notificationManager.cancel(1)
+                    stopService(intentService)
+                    finish()
+                }
+                "startTimer" -> {
+                    if(!counting) {
+                        startTimer()
+                    }
+                }
+                "pauseTimer" -> {
+                    if(counting) {
+                        pauseTimer()
+                    }
+                }
+                "resetTimer" -> {
+                    val intentMain = Intent(context, MainActivity::class.java)
+                    intentMain.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    startActivity(intentMain)
+                    resetTimer()
+                }
+            }
+        }
     }
 
     private fun createCustomDialog() {
@@ -210,7 +216,10 @@ class MainActivity : AppCompatActivity() {
 
         dialog.setPositiveButton("SET TIME") { _: DialogInterface, _: Int ->
             firstStart = true
-            notificationManager.cancel(1)
+            if(startTimer) {
+                MyService.notificationManager.cancel(1)
+                startTimer = false
+            }
             //Save data to Preference
             val values = settings.edit()
             values.putInt("timer_hours",hours.value)
@@ -239,31 +248,29 @@ class MainActivity : AppCompatActivity() {
 
     //Creation a timer counting down and start it
     private fun startTimer() {
-        if(firstStart) {
-            createNotification()
+        if(!startTimer) {
+            startTimer = true
         }
 
-        timer = object: CountDownTimer(time, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                //1 second delay
-                time = millisUntilFinished+1000
-                //Update main timer
-                updateCountDownText()
-                //Update notification timer
-                updateNotificationProgress()
-            }
+        counting = true
+        StartTime.setBackgroundResource(R.drawable.main_rounded_button_disable)
+        StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24_2)
+        PauseTimer.setBackgroundResource(R.drawable.main_rounded_button)
+        PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24)
 
-            override fun onFinish() {
-                MainTimer.text = getString(R.string.end_of_countdown)
-                notificationManager.cancel(1)
-                runAlarm()
-            }
-        }.start()
+        startService(intentService)
+        startAnimation(value)
     }
 
     //Pause timer
     private fun pauseTimer() {
-        timer.cancel()
+        StartTime.setBackgroundResource(R.drawable.main_rounded_button)
+        StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+        PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
+        PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
+        counting = false
+
+        MyService.timer.cancel()
         animator.pause()
         if(firstStart) {
             firstStart = false
@@ -277,8 +284,22 @@ class MainActivity : AppCompatActivity() {
 
     //Reset timer, value, progressBar and cancel notification
     private fun resetTimer() {
+        stopService(intentService)
+        if(counting) {
+            StartTime.setBackgroundResource(R.drawable.main_rounded_button)
+            StartTime.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+            PauseTimer.setBackgroundResource(R.drawable.main_rounded_button_disable)
+            PauseTimer.setImageResource(R.drawable.ic_baseline_pause_24_2)
+            counting = false
+        }
+
         //Stop timer and animation progressBar
-        if(this::timer.isInitialized) timer.cancel()
+        if(startTimer) {
+            MyService.timer.cancel()
+            MyService.notificationManager.cancel(1)
+            startTimer = false
+        }
+
         if(this::animator.isInitialized) animator.pause()
         //Reset main timer
         MainTimer.text = SecondaryTimer.text
@@ -295,22 +316,12 @@ class MainActivity : AppCompatActivity() {
         progressBar.progress = value
 
         //Cancel notification and set flag
-        notificationManager.cancel(1)
         firstStart = true
-    }
-
-    //Function starting when timer is over
-    private fun runAlarm() {
-        //Check if AlarmActivity is running
-        if(AlarmActivity.active) {
-            startActivity(Intent(this, AlarmActivity::class.java))
-            overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
-        }
-        finish()
     }
 
     //Update value timer, then call to setData()
     private fun updateCountDownText() {
+        Log.d("TIME", time.toString())
         HoursValue= ((time/1000)/3600).toInt()
         MinutesValue= (((time/1000)%3600)/60).toInt()
         SecondsValue = ((time/1000)%60).toInt()
@@ -331,54 +342,12 @@ class MainActivity : AppCompatActivity() {
         MainTimer.text = "$HoursText:$MinutesText:$SecondsText"
     }
 
-    //Notification
-    private fun createNotification() {
-
-        //Open MainActivity on by tapping notification
-        val mainIntent = Intent(this, MainActivity::class.java)
-        mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        val mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        /*
-        val startTimer = Intent(this, ActionReceiver::class.java)
-        startTimer.putExtra("action","startTimer");
-        val startTimerPendingIntent = PendingIntent.getBroadcast(this, 1, startTimer, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val pauseTimer = Intent(this, ActionReceiver::class.java)
-        pauseTimer.putExtra("action","pauseTimer");
-        val pauseTimerPendingIntent = PendingIntent.getBroadcast(this, 2, pauseTimer, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val resetTimer = Intent(this, ActionReceiver::class.java)
-        resetTimer.putExtra("action","resetTimer");
-        val resetTimerPendingIntent = PendingIntent.getBroadcast(this, 3, resetTimer, PendingIntent.FLAG_UPDATE_CURRENT)
-        */
-
-        //Notification Builder
-        builder = NotificationCompat.Builder(this, getString(R.string.channel_id)).apply {
-            setSmallIcon(R.drawable.ic_baseline_alarm_24)
-            setContentTitle("Time left:")
-            setContentText("$HoursText h $MinutesText min $SecondsText sec")
-            setColor(ContextCompat.getColor(applicationContext, R.color.colorSecondary))
-            setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setVibrate(longArrayOf(0))
-            setOnlyAlertOnce(true)
-            setOngoing(true)
-            setContentIntent(mainPendingIntent)
-            //addAction(0,"START", startTimerPendingIntent)
-            //addAction(0,"PAUSE", pauseTimerPendingIntent)
-            //addAction(0,"STOP", resetTimerPendingIntent)
-        }
-        PROGRESS_MAX = (time/1000).toInt()
-        PROGRESS_CURRENT = (time/1000).toInt()
-        NotificationManagerCompat.from(this)
-    }
-
     //Update notification timer and progressBar
     private fun updateNotificationProgress() {
-        PROGRESS_CURRENT = (time/1000).toInt()
-        builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
-        builder.setContentText("$HoursText h $MinutesText min $SecondsText sec")
-        notificationManager.notify(1, builder.build())
+        MyService.PROGRESS_CURRENT = (time/1000).toInt()
+        MyService.builder.setProgress(MyService.PROGRESS_MAX, MyService.PROGRESS_CURRENT, false)
+        MyService.builder.setContentText("$HoursText h $MinutesText min $SecondsText sec")
+        MyService.notificationManager.notify(1, MyService.builder.build())
     }
 
     //Double back to exit
@@ -395,10 +364,6 @@ class MainActivity : AppCompatActivity() {
         Handler().postDelayed(Runnable { doubleBackToExitPressedOnce = false }, 2000)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        notificationManager.cancel(1)
-    }
 
     //Start animate progressBar
     private fun startAnimation(startValue: Int) {

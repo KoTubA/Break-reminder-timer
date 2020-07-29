@@ -7,11 +7,12 @@
         app:title="General">
 
         <ListPreference
+            android:focusableInTouchMode="false"
             android:icon="@drawable/ic_outline_palette_24"
-            app:defaultValue="1"
+            app:defaultValue="AppTheme"
             app:entries="@array/theme_list"
             app:entryValues="@array/theme_values"
-            app:key="color_theme"
+            app:key="color_themes"
             app:title="Color themes"
             app:useSimpleSummaryProvider="true" />
 
@@ -19,27 +20,29 @@
 
     <PreferenceCategory app:title="Alarms">
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_alarm_24"
+            app:key="alarm_switch"
+            app:title="Alarm in silent mode"
+            android:summary="Play alarm even when the phone is in vibrate or silent mode"/>
+
         <ListPreference
-            app:defaultValue="1"
-            app:entries="@array/theme_list"
-            app:entryValues="@array/theme_values"
-            app:icon="@drawable/ic_baseline_music_note_24"
-            app:key="sound"
-            app:title="Timer sound"
+            android:focusableInTouchMode="false"
+            app:defaultValue="1min"
+            app:entries="@array/alarm_duration_list"
+            app:entryValues="@array/alarm_duration_values"
+            app:icon="@drawable/ic_baseline_update_24"
+            app:key="alarm_duration"
+            app:title="Ring duration"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:icon="@drawable/ic_baseline_vibration_24"
-            app:key="sync"
-            app:title="Timer vibrate" />
+            app:key="vibrate_switch"
+            app:title="Vibrate in sound mode" />
 
-        <SeekBarPreference
-            android:id="@+id/preference_delay_seek_bar"
-            android:defaultValue="1"
-            android:max="6"
-            android:title="Alarm volume"
-            app:icon="@drawable/ic_baseline_volume_up_24" />
 
     </PreferenceCategory>
 
@@ -49,12 +52,12 @@
         app:title="About">
 
         <Preference
+            android:clickable="false"
+            android:focusableInTouchMode="false"
             android:summary="v.1.0.0"
-            app:defaultValue="reply"
-            app:entries="@array/theme_list"
-            app:entryValues="@array/theme_values"
+            app:defaultValue="false"
             app:icon="@drawable/ic_outline_info_24"
-            app:key="reply"
+            app:key="version"
             app:title="Version app"
             app:useSimpleSummaryProvider="true" />
 

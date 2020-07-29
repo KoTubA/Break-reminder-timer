@@ -23,8 +23,7 @@
             android:gravity="center"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
-            android:text="@string/hours_short"
-            android:textColor="@color/colorWhite" />
+            android:text="@string/hours_short" />
 
         <TextView
             android:id="@+id/textView6"
@@ -33,8 +32,7 @@
             android:gravity="center"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
-            android:text="@string/minutes_short"
-            android:textColor="@color/colorWhite" />
+            android:text="@string/minutes_short" />
 
         <TextView
             android:id="@+id/textView7"
@@ -43,8 +41,7 @@
             android:gravity="center"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
-            android:text="@string/seconds_short"
-            android:textColor="@color/colorWhite" />
+            android:text="@string/seconds_short" />
     </LinearLayout>
 
     <LinearLayout
@@ -58,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:descendantFocusability="blocksDescendants"
-            android:theme="@style/AlertDialogCustom" />
+            android:theme="@style/AlertDialogCustomTextColor" />
 
         <TextView
             android:id="@+id/textView2"
@@ -66,15 +63,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:text="@string/colon"
-            android:textColor="@color/colorWhite" />
+            android:text="@string/colon" />
 
         <NumberPicker
             android:id="@+id/numpicker_minutes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:descendantFocusability="blocksDescendants"
-            android:theme="@style/AlertDialogCustom" />
+            android:theme="@style/AlertDialogCustomTextColor" />
 
         <TextView
             android:id="@+id/textView3"
@@ -82,15 +78,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:text="@string/colon"
-            android:textColor="@color/colorWhite" />
+            android:text="@string/colon" />
 
         <NumberPicker
             android:id="@+id/numpicker_seconds"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:descendantFocusability="blocksDescendants"
-            android:theme="@style/AlertDialogCustom" />
+            android:theme="@style/AlertDialogCustomTextColor" />
 
     </LinearLayout>
 

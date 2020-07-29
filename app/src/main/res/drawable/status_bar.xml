@@ -7,7 +7,7 @@
             android:innerRadiusRatio="2.75"
             android:thickness="40dp"
             android:useLevel="false">
-            <solid android:color="@color/colorShapeProgressBar"/>
+            <solid android:color="?attr/timerBackgroundProgressBarColor"/>
         </shape>
     </item>
     <item android:id="@android:id/progress">
@@ -19,9 +19,9 @@
             android:useLevel="true">
 
             <gradient
-                android:startColor="@color/colorPrimary"
-                android:centerColor="#56a7f2"
-                android:endColor="@color/colorPrimaryBright"
+                android:startColor="?attr/StartProgressBarColor"
+                android:centerColor="?attr/CenterProgressBarColor"
+                android:endColor="?attr/EndProgressBarColor"
                 android:angle="-45" />
             <corners android:radius="8dp"/>
         </shape>

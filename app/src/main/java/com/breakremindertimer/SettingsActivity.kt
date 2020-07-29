@@ -1,5 +1,7 @@
 package com.breakremindertimer
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -7,19 +9,17 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         //Users preference
         val themePreference = PreferenceManager.getDefaultSharedPreferences(this)
-        var text: String? = themePreference.getString("color_theme", "")
-
-        when (text) {
+        when (themePreference.getString("color_themes", "")) {
             "AppThemeDark" -> {
                 setTheme(R.style.AppThemeDark)
             }
-            "AppThemeLight" -> {
-                setTheme(R.style.AppThemeLight)
+            "AppThemeBlackAndWhite" -> {
+                setTheme(R.style.AppThemeBlackAndWhite)
             }
             else -> {
                 setTheme(R.style.AppTheme)
@@ -34,14 +34,18 @@ class SettingsActivity : AppCompatActivity() {
             .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        themePreference.registerOnSharedPreferenceChangeListener(this)
+
     }
 
+    //Set activity
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
         }
     }
 
+    //Back to main activity
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -50,5 +54,27 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    
+    //Listener change user preference
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        if (key == "color_themes") {
+            restartApp()
+        }
+    }
+
+    //Unregister listener
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    //Reset Application
+    private fun restartApp() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+        overridePendingTransition(R.anim.zoom_in, R.anim.static_animation)
     }
 }

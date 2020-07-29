@@ -7,6 +7,7 @@
     <string name="seconds_short">S</string>
     <string name="dialog_title">Set time:</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="end_of_countdown">00:00:00</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -19,7 +20,11 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Register notification chanel -->
+    <string name="channel_name">Show countdown status</string>
+    <string name="channel_description">Track and edit your countdown progress</string>
+    <string name="channel_id">com.timer.breakremindertimer</string>
 </resources>

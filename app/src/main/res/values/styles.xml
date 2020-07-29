@@ -4,30 +4,63 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorTaskBar</item>
         <item name="colorPrimaryDark">@color/colorTopBar</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorSecondary</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textColorSecondary">@color/colorGray</item>
         <item name="android:windowBackground">@color/colorPrimaryDark</item>
+        <item name="timerBgColor">@color/colorPrimaryDark</item>
+        <item name="timerSecondColor">@color/colorGray</item>
+        <item name="timerBackgroundProgressBarColor">@color/colorBackgroundProgressBar</item>
+        <item name="SecondaryBackgroundColor">@color/colorSecondary</item>
+        <item name="SecondaryTextColor">@color/colorWhite</item>
+        <!-- Gradient ProgressBar -->
+        <item name="StartProgressBarColor">@color/colorStartProgressBar</item>
+        <item name="CenterProgressBarColor">@color/colorCenterProgressBar</item>
+        <item name="EndProgressBarColor">@color/colorEndProgressBar</item>
+        <!-- Custom Dialog -->
+        <item name="alertDialogTheme">@style/AlertDialogCustom</item>
     </style>
 
     <!-- Dark application theme -->
     <style name="AppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorTaskBar_DarkTheme</item>
         <item name="colorPrimaryDark">@color/colorTopBar_DarkTheme</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorSecondary</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textColorSecondary">@color/colorGray</item>
         <item name="android:windowBackground">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="timerBgColor">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="timerSecondColor">@color/colorGray</item>
+        <item name="timerBackgroundProgressBarColor">@color/colorBackgroundProgressBar_DarkTheme</item>
+        <item name="SecondaryBackgroundColor">@color/colorSecondary</item>
+        <item name="SecondaryTextColor">@color/colorWhite</item>
+        <!-- Gradient ProgressBar -->
+        <item name="StartProgressBarColor">@color/colorStartProgressBar</item>
+        <item name="CenterProgressBarColor">@color/colorCenterProgressBar</item>
+        <item name="EndProgressBarColor">@color/colorEndProgressBar</item>
+        <!-- Custom Dialog -->
+        <item name="alertDialogTheme">@style/AlertDialogCustomDark</item>
     </style>
 
-    <!-- Light application theme -->
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorTaskBar</item>
-        <item name="colorPrimaryDark">@color/colorTopBar</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+    <!-- Black and White application theme-->
+    <style name="AppThemeBlackAndWhite" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorTaskBar_DarkTheme</item>
+        <item name="colorPrimaryDark">@color/colorTopBar_DarkTheme</item>
+        <item name="colorAccent">@color/colorWhite</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:textColorSecondary">@color/colorGray</item>
-        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="timerBgColor">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="timerSecondColor">@color/colorGray</item>
+        <item name="timerBackgroundProgressBarColor">@color/colorBackgroundProgressBar_DarkTheme</item>
+        <item name="SecondaryBackgroundColor">@color/colorSecondaryBlackAndWhite</item>
+        <item name="SecondaryTextColor">@color/colorPrimaryDark_DarkTheme</item>
+        <!-- Gradient ProgressBar -->
+        <item name="StartProgressBarColor">@color/colorSecondaryBlackAndWhite</item>
+        <item name="CenterProgressBarColor">@color/colorSecondaryBlackAndWhite</item>
+        <item name="EndProgressBarColor">@color/colorSecondaryBlackAndWhite</item>
+        <!-- Custom Dialog -->
+        <item name="alertDialogTheme">@style/AlertDialogCustomBlackAndWhite</item>
     </style>
 
     <!-- No action bar base application theme-->
@@ -42,16 +75,51 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- No action bar light application theme-->
-    <style name="AppTheme.NoActionBarLight" parent="AppThemeLight">
+    <!-- No action bar dark application theme-->
+    <style name="AppTheme.NoActionBarBlackAndWhite" parent="AppThemeBlackAndWhite">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- Custom Alert Dialog -->
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:background">@color/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/colorWhite</item>
+        <item name="textColorAlertDialogListItem">@color/colorWhite</item>
+        <item name="colorControlNormal">@color/colorTopBar</item>
+        <item name="colorControlActivated">@color/colorSecondary</item>
+    </style>
+
+    <!-- Custom Alert Dialog Dark -->
+    <style name="AlertDialogCustomDark" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+        <item name="textColorAlertDialogListItem">@color/colorWhite</item>
+        <item name="colorControlNormal">@color/colorGray</item>
+        <item name="colorControlActivated">@color/colorSecondary</item>
+    </style>
+
+    <!-- Custom Alert Dialog Dark 2 -->
+    <style name="AlertDialogCustomBlackAndWhite" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@color/colorPrimaryDark_DarkTheme</item>
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+        <item name="textColorAlertDialogListItem">@color/colorWhite</item>
+        <item name="colorControlNormal">@color/colorGray</item>
+        <item name="colorControlActivated">@color/colorWhite</item>
+    </style>
+
+    <!-- Custom Number Picker -->
+    <style name="AlertDialogCustomTextColor" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorPrimary">@color/colorWhite</item>
+    </style>
+
+    <!-- SplashScreen theme -->
+    <style name="SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@drawable/splash_background</item>
     </style>
 
 </resources>
